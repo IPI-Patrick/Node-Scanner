@@ -3,17 +3,25 @@ const ModbusRTU = require("modbus-serial");
 const { connect } = require('http2');
 
 const timer = ms => new Promise(res => setTimeout(res, ms))
-const timeOut = 200;
-const numOfNodes = 5;
-const brs = [9600, 19200, 38400];
-const prs = ['none', 'even', 'odd'];
 
 var found = [];
 
 async function main() {
     var ports = await SerialPort.list();
-    var port  = 'COM8';
+    
+    var argv = require('minimist')(process.argv.slice(2));
 
+    console.log(argv)
+    const timeOut = argv?.t || 200;
+    const numOfNodes = argv?.n || 8;
+    const brs = argv?.b?.split(',')?.map((b) => parseInt(b)) || [9600, 19200, 38400];
+    const prs = argv?.p?.split(',') || ['None', 'even', 'odd'];
+
+    
+    var port  = argv.c || 'COM16';
+    
+    console.log(timeOut, numOfNodes, brs, prs, port);
+    
     console.log(ports.map((p) => p.path))
 
     var client = new ModbusRTU();

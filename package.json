@@ -1,0 +1,25 @@
+{
+  "name": "node-scanner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "nodeScan.js",
+  "dependencies": {
+    "modbus-serial": "^8.0.5",
+    "serialport": "^9.2.8"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node nodeScan.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IPI-Patrick/Node-Scanner.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IPI-Patrick/Node-Scanner/issues"
+  },
+  "homepage": "https://github.com/IPI-Patrick/Node-Scanner#readme"
+}
