@@ -1,0 +1,77 @@
+const SerialPort = require('serialport');
+const ModbusRTU = require("modbus-serial");
+const { connect } = require('http2');
+
+const timer = ms => new Promise(res => setTimeout(res, ms))
+const timeOut = 200;
+const numOfNodes = 5;
+const brs = [9600, 19200, 38400];
+const prs = ['none', 'even', 'odd'];
+
+var found = [];
+
+async function main() {
+    var ports = await SerialPort.list();
+    var port  = 'COM8';
+
+    console.log(ports.map((p) => p.path))
+
+    var client = new ModbusRTU();
+    for (let br of brs) {
+        for(let pr of prs) {
+            if(client.isOpen) client.close();
+            client = new ModbusRTU();
+            try {                
+                var connected = false;
+                while(!connected || !client.isOpen) {
+                    try {
+                        await client.connectRTUBuffered(port, {baudRate: br, parity: pr})            
+                    } catch(e) {
+                        // console.log(e)
+                    }
+                    finally {
+                        connected = true;
+                    }
+                }
+
+                // await timer(100);
+                await client.setTimeout(timeOut)
+                console.log(br, pr)
+
+                for(let i = 1; i <= numOfNodes; i++) {
+                    var notOpen = false;
+                    while(!notOpen) {
+                        try {
+                            await client.setID(i);
+                            await timer(100);
+                            
+                            var readings = await client.readInputRegisters(0, 1);                            
+                            readings = readings.data;   
+                            console.log(i, readings)                                
+                            found.push({node: i, baud: br, parity: pr, reading: readings});
+                            notOpen = true;
+                        } catch(e) {
+                            console.log(i, e.message)      
+                            if(e.message.includes('Open')) {
+                                notOpen = false;    
+                                console.log('retrying')
+                                await client.connectRTUBuffered(port, {baudRate: br, parity: pr})    
+                                await timer(100);        
+                            }
+                            else notOpen = true;                  
+                        }
+                    }
+                }
+            
+
+                
+            } catch(e) {console.log(e)}
+        }
+    }    
+
+    await client.setTimeout(400);
+    console.log(found)
+
+}
+
+main();
