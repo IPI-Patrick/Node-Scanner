@@ -15,7 +15,7 @@ async function main() {
     const timeOut = argv?.t || 200;
     const numOfNodes = argv?.n || 8;
     const brs = argv?.b?.split(',')?.map((b) => parseInt(b)) || [9600, 19200, 38400];
-    const prs = argv?.p?.split(',') || ['None', 'even', 'odd'];
+    const prs = argv?.p?.split(',') || ['none', 'even', 'odd'];
 
     
     var port  = argv.c || 'COM16';
@@ -35,7 +35,7 @@ async function main() {
                     try {
                         await client.connectRTUBuffered(port, {baudRate: br, parity: pr})            
                     } catch(e) {
-                        // console.log(e)
+                        console.log(e)
                     }
                     finally {
                         connected = true;
